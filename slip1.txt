@@ -1,0 +1,88 @@
+a. Take multiple files as Command Line Arguments and print their inode number.
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    if (argc < 2) 
+    {
+        fprintf(stderr, "Usage: %s <file1> <file2> ... <fileN>\n", argv[0]);
+        return 1;
+    }
+
+    for (int i = 1; i < argc; i++) 
+    {
+        const char *filename = argv[i];
+        struct stat file_info;
+
+        if (stat(filename, &file_info) == -1) 
+        {
+            perror("stat");
+            continue;
+        }
+
+        printf("File: %s\n", filename);
+        printf("Inode Number: %ld\n", (long)file_info.st_ino);
+        printf("\n");
+    }
+
+    return 0;    
+}
+b.
+/* Assignment No-27 Write a C program to send SIGALRM signal by child process to parent process and parent process make a provision to catch the signal and display alarm is fired.(Use Kill, fork, signal and sleep system call)
+You can create a C program where the child process sends a SIGALRM signal to the parent process, and the parent process catches the signal and displays "Alarm is fired." You can use the kill, fork, signal, and sleep system calls to achieve this. Here's a sample program:*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+pid_t child_pid;
+
+// Signal handler for SIGALRM
+void alarm_handler(int signum) {
+    if (signum == SIGALRM) {
+        printf("Alarm is fired.\n");
+    }
+}
+
+int main() {
+    // Set up the signal handler for SIGALRM
+    signal(SIGALRM, alarm_handler);
+
+    // Create a child process
+    child_pid = fork();
+
+    if (child_pid == -1) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    if (child_pid == 0) {
+        // Child process
+        sleep(2); // Wait for 2 seconds
+
+        // Send SIGALRM to the parent process
+        if (kill(getppid(), SIGALRM) == -1) {
+            perror("kill SIGALRM");
+            exit(EXIT_FAILURE);
+        }
+
+        exit(EXIT_SUCCESS);
+    } else {
+        // Parent process
+        printf("Parent process waiting for the alarm.\n");
+
+        // Wait for the child to complete
+        wait(NULL);
+
+        printf("Parent process exiting.\n");
+    }
+
+    return 0;
+}

@@ -1,0 +1,125 @@
+//Assignment No-4: Print the type of file where file name accepted through Command Line.
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    if (argc != 2) 
+    {
+        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    const char *filename = argv[1];
+
+    struct stat file_info;
+    if (stat(filename, &file_info) == -1) 
+    {
+        perror("stat");
+        return 1;
+    }
+
+    if (S_ISREG(file_info.st_mode)) 
+    {
+        printf("Regular File\n");
+    } 
+    else if (S_ISDIR(file_info.st_mode)) 
+    {
+        printf("Directory\n");
+    } 
+    else if (S_ISCHR(file_info.st_mode))
+    {
+        printf("Character Device\n");
+    } 
+    else if (S_ISBLK(file_info.st_mode)) 
+    {
+        printf("Block Device\n");
+    } 
+    else if (S_ISFIFO(file_info.st_mode)) 
+    {
+        printf("FIFO (Named Pipe)\n");
+    } 
+    else if (S_ISLNK(file_info.st_mode)) 
+    {
+        printf("Symbolic Link\n");
+    } 
+    else if (S_ISSOCK(file_info.st_mode)) 
+    {
+        printf("Socket\n");
+    } 
+    else 
+    {
+        printf("Unknown File Type\n");
+    }
+
+    return 0;
+}
+b.
+/*Assignment No 31 You can create a C program that spawns a child process to run a Linux/Unix command or any user-defined program. The parent process will set a signal handler for the death of the child (SIGCHLD) signal and the alarm (SIGALRM) signal. If the child process does not complete its execution within 5 seconds, the parent process will kill the child process. */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+void child_signal_handler(int signum) {
+    if (signum == SIGCHLD) {
+        printf("Child process has terminated.\n");
+    }
+}
+
+void alarm_signal_handler(int signum) {
+    if (signum == SIGALRM) {
+        printf("Child process did not complete within 5 seconds. Killing child.\n");
+        kill(getpid(), SIGKILL);
+    }
+}
+
+int main() {
+    pid_t child_pid;
+
+    // Set up signal handlers
+    signal(SIGCHLD, child_signal_handler);
+    signal(SIGALRM, alarm_signal_handler);
+
+    // Create a child process
+    child_pid = fork();
+
+    if (child_pid == -1) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    if (child_pid == 0) {
+        // Child process
+        printf("Child process is running.\n");
+
+        // Simulate a time-consuming operation (e.g., sleep for 10 seconds)
+        sleep(10);
+
+        printf("Child process is done.\n");
+        exit(EXIT_SUCCESS);
+    } else {
+        // Parent process
+        printf("Parent process waiting for the child to complete or timeout (5 seconds).\n");
+
+        // Set an alarm for 5 seconds
+        alarm(5);
+
+        // Wait for the child to complete
+        wait(NULL);
+
+        // Disable the alarm
+        alarm(0);
+
+        printf("Parent process is exiting.\n");
+    }
+
+    return 0;
+}
+

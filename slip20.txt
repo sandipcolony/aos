@@ -1,0 +1,29 @@
+/* Assignment No-28 Write a C program that illustrates suspending and resuming processes using signals.
+You can create a C program to illustrate suspending and resuming processes using signals. In this example, we will use SIGTSTP (Ctrl-Z) to suspend a process and SIGCONT to resume it. Here's a sample program:*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <unistd.h>
+
+// Signal handler for SIGTSTP (Ctrl-Z)
+void suspend_handler(int signum) {
+    printf("Process suspended (Ctrl-Z received). PID: %d\n", getpid());
+    raise(SIGSTOP); // Suspend the process
+}
+
+int main() {
+    // Set up the signal handler for SIGTSTP (Ctrl-Z)
+    signal(SIGTSTP, suspend_handler);
+
+    printf("My PID: %d\n", getpid());
+    printf("Press Ctrl-Z to suspend this process, and then 'fg' to resume it.\n");
+
+    while (1) {
+        // Process continues running
+        sleep(1);
+        printf("Processing...\n");
+    }
+
+    return 0;
+}

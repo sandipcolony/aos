@@ -1,0 +1,118 @@
+//Assignment No-2: Take multiple files as Command Line Arguments and print their inode number.
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    if (argc < 2) 
+    {
+        fprintf(stderr, "Usage: %s <file1> <file2> ... <fileN>\n", argv[0]);
+        return 1;
+    }
+
+    for (int i = 1; i < argc; i++) 
+    {
+        const char *filename = argv[i];
+        struct stat file_info;
+
+        if (stat(filename, &file_info) == -1) 
+        {
+            perror("stat");
+            continue;
+        }
+
+        printf("File: %s\n", filename);
+        printf("Inode Number: %ld\n", (long)file_info.st_ino);
+        printf("\n");
+    }
+
+    return 0;    
+}
+b.
+/*Assignment no-19 Implement the following unix/linux command (use fork, pipe and exec system call) ls â€“l | wc â€“l
+To implement the Unix/Linux command ls -l | wc -l in a C program using fork, pipe, and exec system calls, you need to create a pipeline between the ls and wc commands. The ls command lists the files in the current directory with details, and wc -l counts the number of lines in the input.*/
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() 
+{
+    int pipe_fd[2];
+    pid_t pid1, pid2;
+
+    // Create a pipe
+    if (pipe(pipe_fd) == -1) 
+    {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+
+    // Fork the first child (for ls -l)
+    pid1 = fork();
+
+    if (pid1 == -1) 
+    {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    if (pid1 == 0) 
+    { // Child 1 (ls -l)
+        // Close the read end of the pipe
+        close(pipe_fd[0]);
+
+        // Redirect stdout to the write end of the pipe
+        dup2(pipe_fd[1], STDOUT_FILENO);
+        close(pipe_fd[1]);
+
+        // Execute ls -l
+        execlp("ls", "ls", "-l", NULL);
+        perror("execlp (ls)");
+        exit(EXIT_FAILURE);
+    } 
+    else 
+    { // Parent
+        // Fork the second child (for wc -l)
+        pid2 = fork();
+
+        if (pid2 == -1) 
+        {
+            perror("fork");
+            exit(EXIT_FAILURE);
+        }
+
+        if (pid2 == 0) 
+        { // Child 2 (wc -l)
+            // Close the write end of the pipe
+            close(pipe_fd[1]);
+
+            // Redirect stdin to the read end of the pipe
+            dup2(pipe_fd[0], STDIN_FILENO);
+            close(pipe_fd[0]);
+
+            // Execute wc -l
+            execlp("wc", "wc", "-l", NULL);
+            perror("execlp (wc)");
+            exit(EXIT_FAILURE);
+        } 
+        else 
+        { // Parent
+            // Close both ends of the pipe
+            close(pipe_fd[0]);
+            close(pipe_fd[1]);
+
+            // Wait for both child processes to complete
+            wait(NULL);
+            wait(NULL);
+        }
+    }
+
+    return 0;
+}

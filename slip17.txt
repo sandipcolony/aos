@@ -1,0 +1,114 @@
+//Assignment No-7 Read the current directory and display the name of the files, no of files in current directory.
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+
+int main() 
+{
+    // Open the current directory
+    DIR *dir = opendir(".");
+
+    if (dir == NULL) 
+    {
+        perror("opendir");
+        return 1;
+    }
+
+    int file_count = 0;
+
+    // Read the directory entries
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) 
+    {
+        // Check if the entry is a regular file
+        if (entry->d_type == DT_REG) 
+        {
+            printf("%s\n", entry->d_name);
+            file_count++;
+        }
+    }
+
+    // Close the directory
+    closedir(dir);
+
+    printf("Total number of files in the current directory: %d\n", file_count);
+
+    return 0;
+}
+b.
+/*Assignment No 30 Write a C program to implement the following unix/linux command (use fork, pipe SPPU M.Sc. Computer Science Syllabus 2023-24 19 and exec system call). Your program should block the signal Ctrl-C and Ctrl-\ signal during the execution. i. Ls â€“l | wc â€“l
+To implement the Unix/Linux command ls -l | wc -l in a C program using fork, pipe, and exec system calls, and to block the Ctrl-C and Ctrl-\ signals during execution*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <signal.h>
+
+void signal_handler(int signum) {
+    // Empty signal handler to block Ctrl-C and Ctrl-\ signals
+}
+
+int main() {
+    int pipefd[2];
+    pid_t ls_pid, wc_pid;
+
+    // Block Ctrl-C and Ctrl-\ signals
+    signal(SIGINT, signal_handler);
+    signal(SIGQUIT, signal_handler);
+
+    // Create a pipe
+    if (pipe(pipefd) == -1) {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+
+    // Create the first child process for "ls -l"
+    ls_pid = fork();
+
+    if (ls_pid == -1) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    if (ls_pid == 0) {
+        // Child process for "ls -l"
+        close(pipefd[0]); // Close the read end of the pipe
+        dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to the write end of the pipe
+        close(pipefd[1]); // Close the original write end of the pipe
+
+        // Execute "ls -l" command
+        execlp("ls", "ls", "-l", NULL);
+        perror("execlp(ls)");
+        exit(EXIT_FAILURE);
+    } else {
+        // Create the second child process for "wc -l"
+        wc_pid = fork();
+
+        if (wc_pid == -1) {
+            perror("fork");
+            exit(EXIT_FAILURE);
+        }
+
+        if (wc_pid == 0) {
+            // Child process for "wc -l"
+            close(pipefd[1]); // Close the write end of the pipe
+            dup2(pipefd[0], STDIN_FILENO); // Redirect stdin to the read end of the pipe
+            close(pipefd[0]); // Close the original read end of the pipe
+
+            // Execute "wc -l" command
+            execlp("wc", "wc", "-l", NULL);
+            perror("execlp(wc)");
+            exit(EXIT_FAILURE);
+        } else {
+            // Parent process
+            close(pipefd[0]); // Close both ends of the pipe in the parent
+
+            // Wait for both child processes to finish
+            waitpid(ls_pid, NULL, 0);
+            waitpid(wc_pid, NULL, 0);
+        }
+    }
+
+    return 0;
+    }

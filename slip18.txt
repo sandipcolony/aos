@@ -1,0 +1,93 @@
+//Assignment No-5: Write a C program to find whether a given file is present in current directory or not.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    if (argc != 2) 
+    {
+        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    const char *filename = argv[1];
+
+    if (access(filename, F_OK) == 0) 
+    {
+        printf("File '%s' is present in the current directory.\n", filename);
+    } 
+    else 
+    {
+        printf("File '%s' is not present in the current directory.\n", filename);
+    }
+
+    return 0;
+}
+b.
+/*Assignment No-21 Write a C program to create an unnamed pipe. The child process will write following
+three messages to pipe and parent process display it.
+Message1 = â€œHello Worldâ€
+Message2 = â€œHello SPPUâ€
+Message3 = â€œLinux is Funny
+To create an unnamed pipe in C and have a child process write three messages to the pipe while the parent process reads and displays them*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+#define MSG_SIZE 100
+
+int main() {
+    int pipefd[2];
+    pid_t child_pid;
+
+    // Create the pipe
+    if (pipe(pipefd) == -1) {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+
+    // Create a child process
+    child_pid = fork();
+
+    if (child_pid == -1) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    if (child_pid == 0) {
+        // Child process
+        close(pipefd[0]); // Close the read end of the pipe
+
+        // Messages to write
+        char messages[][MSG_SIZE] = {
+            "Hello World",
+            "Hello SPPU",
+            "Linux is Funny"
+        };
+
+        for (int i = 0; i < 3; i++) {
+            // Write the message to the pipe
+            write(pipefd[1], messages[i], strlen(messages[i]) + 1);
+        }
+
+        close(pipefd[1]); // Close the write end of the pipe in the child
+        exit(EXIT_SUCCESS);
+    } else {
+        // Parent process
+        close(pipefd[1]); // Close the write end of the pipe
+
+        char buffer[MSG_SIZE];
+
+        while (read(pipefd[0], buffer, sizeof(buffer)) > 0) {
+            // Read and display the messages from the pipe
+            printf("Parent received: %s\n", buffer);
+        }
+
+        close(pipefd[0]); // Close the read end of the pipe in the parent
+        wait(NULL);       // Wait for the child to finish
+    }
+
+    return 0;
+}

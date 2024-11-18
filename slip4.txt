@@ -1,0 +1,103 @@
+//Assignment No-5: Write a C program to find whether a given file is present in current directory or not.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    if (argc != 2) 
+    {
+        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    const char *filename = argv[1];
+
+    if (access(filename, F_OK) == 0) 
+    {
+        printf("File '%s' is present in the current directory.\n", filename);
+    } 
+    else 
+    {
+        printf("File '%s' is not present in the current directory.\n", filename);
+    }
+
+    return 0;
+}
+b.
+/*
+Assignment No-26 Write a C program which creates a child process and child process catches a signal SIGHUP, SIGINT and SIGQUIT. The Parent process send a SIGHUP or SIGINT signal after every 3 seconds, at the end of 15 second parent send SIGQUIT signal to child and child terminates by displaying message "My Papa has Killed me!!!â€
+You can create a C program where the parent process sends SIGHUP or SIGINT signals to the child process every 3 seconds and, after 15 seconds, sends a SIGQUIT signal to terminate the child process. Here's a sample program that accomplishes this:*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+pid_t child_pid;
+
+// Signal handler for SIGHUP, SIGINT, and SIGQUIT
+void signal_handler(int signum) {
+    if (signum == SIGHUP) {
+        printf("Child received SIGHUP signal.\n");
+    } else if (signum == SIGINT) {
+        printf("Child received SIGINT signal.\n");
+    } else if (signum == SIGQUIT) {
+        printf("Child received SIGQUIT signal. My Papa has Killed me!!!\n");
+        exit(EXIT_SUCCESS);
+    }
+}
+
+int main() {
+    // Create a child process
+    child_pid = fork();
+
+    if (child_pid == -1) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    if (child_pid == 0) {
+        // Child process
+        signal(SIGHUP, signal_handler);
+        signal(SIGINT, signal_handler);
+        signal(SIGQUIT, signal_handler);
+
+        while (1) {
+            // Child process continues to run
+            sleep(1);
+        }
+    } else {
+        // Parent process
+        sleep(3); // Wait for 3 seconds
+
+        // Send SIGHUP to the child
+        if (kill(child_pid, SIGHUP) == -1) {
+            perror("kill SIGHUP");
+            exit(EXIT_FAILURE);
+        }
+
+        sleep(3); // Wait for another 3 seconds
+
+        // Send SIGINT to the child
+        if (kill(child_pid, SIGINT) == -1) {
+            perror("kill SIGINT");
+            exit(EXIT_FAILURE);
+        }
+
+        sleep(9); // Wait for a total of 15 seconds
+
+        // Send SIGQUIT to the child to terminate it
+        if (kill(child_pid, SIGQUIT) == -1) {
+            perror("kill SIGQUIT");
+            exit(EXIT_FAILURE);
+        }
+
+        // Wait for the child to exit
+        wait(NULL);
+    }
+
+    return 0;
+}
