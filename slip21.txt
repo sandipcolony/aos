@@ -1,11 +1,11 @@
-//Assignment No-7 Read the current directory and display the name of the files, no of files in current directory.
+a.
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
 
 int main() 
 {
-    // Open the current directory
+   
     DIR *dir = opendir(".");
 
     if (dir == NULL) 
@@ -16,11 +16,11 @@ int main()
 
     int file_count = 0;
 
-    // Read the directory entries
+   
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL) 
     {
-        // Check if the entry is a regular file
+        
         if (entry->d_type == DT_REG) 
         {
             printf("%s\n", entry->d_name);
@@ -28,7 +28,7 @@ int main()
         }
     }
 
-    // Close the directory
+ 
     closedir(dir);
 
     printf("Total number of files in the current directory: %d\n", file_count);
@@ -36,22 +36,20 @@ int main()
     return 0;
 }
 b.
-//Assignment No-8 Write a C program which receives file names as command line
-//arguments and display those filenames in ascending order according to their
-//sizes. I) (e.g $ a.out a.txt b.txt c.txt, â€¦)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
-// Define a structure to hold file information
+
 struct FileInfo 
 {
   char* name;
   off_t size;
 };
 
-// Comparison function for sorting FileInfo structures by size
+
 int compareFileInfo(const void* a, const void* b) 
 {
   return ((struct FileInfo*)a)->size - ((struct FileInfo*)b)->size;
@@ -60,14 +58,14 @@ int compareFileInfo(const void* a, const void* b)
 
 int main(int argc, char* argv[]) 
 {
-  // Check if the user provided at least one file name
+ 
   if (argc < 2) 
   {
     fprintf(stderr,"Usage: %s <file1> <file2> ... <fileN>;\n", argv[0]);
     return 1;
   }
 
-  // Create an array of FileInfo structures to hold file information
+ 
   struct FileInfo* fileInfos = malloc((argc - 1) * sizeof(struct FileInfo));
 
   if (fileInfos == NULL)
@@ -76,7 +74,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  // Obtain file sizes and store file information
+
   for (int i = 1; i <argc; i++) 
   {
     struct stat fileStat;
@@ -93,17 +91,17 @@ int main(int argc, char* argv[])
     }
   }
 
-  // Sort the fileInfos array based on file size
+  
   qsort(fileInfos, argc - 1, sizeof(struct FileInfo), compareFileInfo);
 
-  // Display the sorted file names
+
   for (int i = 0; i < argc - 1; i++) 
   {
     printf("%s: %ld bytes\n", fileInfos[i].name, (long)fileInfos[i].size);
     free(fileInfos[i].name);
   }
 
-  // Free allocated memory
+
   free(fileInfos);
 
   return 0;
