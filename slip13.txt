@@ -1,5 +1,4 @@
-//Assignment No-6 Write a C program that a string as an argument and return all the files that begins with that name in the current directory. 
-//For example > ./a.out foo will return all file names that begins with foo.
+a.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,14 +6,14 @@
 
 int main(int argc, char *argv[]) 
 {
-    // Check if the user provided the prefix as an argument
+    
     if (argc != 2) 
     {
         fprintf(stderr, "Usage: %s <prefix>\n", argv[0]);
         return 1;
     }
 
-    // Open the current directory
+    
     DIR *dir = opendir(".");
     
     if (dir == NULL) 
@@ -23,49 +22,48 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // Get the prefix from the command line argument
+   
     char *prefix = argv[1];
     size_t prefix_len = strlen(prefix);
 
-    // Read the directory entries
+   
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL) 
     {
-        // Check if the entry is a regular file and starts with the prefix
+        
         if (entry->d_type == DT_REG && strncmp(prefix, entry->d_name, prefix_len) == 0) {
             printf("%s\n", entry->d_name);
         }
     }
 
-    // Close the directory
+   
     closedir(dir);
 
     return 0;
 }
 b.
-/* Assignment No-28 Write a C program that illustrates suspending and resuming processes using signals.
-You can create a C program to illustrate suspending and resuming processes using signals. In this example, we will use SIGTSTP (Ctrl-Z) to suspend a process and SIGCONT to resume it. Here's a sample program:*/
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
 
-// Signal handler for SIGTSTP (Ctrl-Z)
+
 void suspend_handler(int signum) {
     printf("Process suspended (Ctrl-Z received). PID: %d\n", getpid());
     raise(SIGSTOP); // Suspend the process
 }
 
 int main() {
-    // Set up the signal handler for SIGTSTP (Ctrl-Z)
+   
     signal(SIGTSTP, suspend_handler);
 
     printf("My PID: %d\n", getpid());
     printf("Press Ctrl-Z to suspend this process, and then 'fg' to resume it.\n");
 
     while (1) {
-        // Process continues running
+       
         sleep(1);
         printf("Processing...\n");
     }
