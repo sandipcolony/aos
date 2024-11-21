@@ -1,9 +1,4 @@
-//Assignment No-9 Display all the files from current directory which are created in
-//particular month.To display all the files from the current directory that were created 
-//in a particular month using C programming on Unix-like systems, you can use the 
-//dirent.h library to iterate through the files and the stat function to get file creation 
-//timestamps. Here&#39;s a C program that does this:
-
+a.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,14 +8,14 @@
 
 int main(int argc, char *argv[]) 
 {
-    // Check if the user provided the target month as an argument
+   
     if (argc != 2)
     {
         fprintf(stderr, "Usage: %s <month>\n", argv[0]);
         return 1;
     }
 
-    // Convert the month argument to an integer (1-12)
+   
     int target_month = atoi(argv[1]);
     if (target_month < 1 || target_month > 12) 
     {
@@ -28,7 +23,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // Open the current directory
+  
     DIR *dir = opendir(".");
     if (dir == NULL) 
     {
@@ -36,18 +31,17 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // Read the directory entries
+   
     struct dirent *entry;
     
     while ((entry = readdir(dir)) != NULL) 
     {
-        // Skip "." and ".." directory entries
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) 
         {
             continue;
         }
 
-        // Get file information
+       
         struct stat file_stat;
         if (stat(entry->d_name, &file_stat) == -1) 
         {
@@ -55,24 +49,23 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        // Extract the month from the file&#39;s creation timestamp
+        
         struct tm *creation_time = localtime(&file_stat.st_ctime);
         int file_month = creation_time->tm_mon + 1; // Month is 0-based, so add 1
 
-        // Check if the file was created in the target month
+        
         if (file_month == target_month) 
         {
             printf("%s\n", entry->d_name);
         }
     }
 
-    // Close the directory
+    
     closedir(dir);
     return 0;
 }
 b.
-/*Assignment No-29 Write a C program which create a child process which catch a signal sighup, sigint and sigquit. The Parent process send a sighup or sigint signal after every 3 seconds, at the end of 30 second parent send sigquit signal to child and child terminates my displaying message â€œMy DADDY has Killed me!!!â€
-You can create a C program where the child process catches the SIGHUP, SIGINT, and SIGQUIT signals, and the parent process sends SIGHUP or SIGINT signals to the child every 3 seconds. After 30 seconds, the parent sends a SIGQUIT signal to terminate the child process. */
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -83,7 +76,7 @@ You can create a C program where the child process catches the SIGHUP, SIGINT, a
 
 pid_t child_pid;
 
-// Signal handler for SIGHUP, SIGINT, and SIGQUIT
+
 void signal_handler(int signum) {
     if (signum == SIGHUP) {
         printf("Child received SIGHUP signal.\n");
@@ -96,7 +89,7 @@ void signal_handler(int signum) {
 }
 
 int main() {
-    // Create a child process
+ 
     child_pid = fork();
 
     if (child_pid == -1) {
@@ -105,23 +98,23 @@ int main() {
     }
 
     if (child_pid == 0) {
-        // Child process
+       
         signal(SIGHUP, signal_handler);
         signal(SIGINT, signal_handler);
         signal(SIGQUIT, signal_handler);
 
         while (1) {
-            // Child process continues to run
+            
             sleep(1);
         }
     } else {
-        // Parent process
+       
         printf("Parent process waiting for 30 seconds.\n");
 
-        // Wait for 30 seconds
+       
         sleep(30);
 
-        // Send SIGHUP to the child
+      
         if (kill(child_pid, SIGHUP) == -1) {
             perror("kill SIGHUP");
             exit(EXIT_FAILURE);
@@ -129,13 +122,13 @@ int main() {
 
         sleep(3); // Wait for 3 more seconds
 
-        // Send SIGINT to the child
+        
         if (kill(child_pid, SIGINT) == -1) {
             perror("kill SIGINT");
             exit(EXIT_FAILURE);
         }
 
-        // Wait for the child to complete
+      
         wait(NULL);
 
         printf("Parent process exiting.\n");
