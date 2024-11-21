@@ -1,19 +1,17 @@
-//Assignment No-8 Write a C program which receives file names as command line
-//arguments and display those filenames in ascending order according to their
-//sizes. I) (e.g $ a.out a.txt b.txt c.txt, â€¦)
+a.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
-// Define a structure to hold file information
+
 struct FileInfo 
 {
   char* name;
   off_t size;
 };
 
-// Comparison function for sorting FileInfo structures by size
+
 int compareFileInfo(const void* a, const void* b) 
 {
   return ((struct FileInfo*)a)->size - ((struct FileInfo*)b)->size;
@@ -22,14 +20,14 @@ int compareFileInfo(const void* a, const void* b)
 
 int main(int argc, char* argv[]) 
 {
-  // Check if the user provided at least one file name
+ 
   if (argc < 2) 
   {
     fprintf(stderr,"Usage: %s <file1> <file2> ... <fileN>;\n", argv[0]);
     return 1;
   }
 
-  // Create an array of FileInfo structures to hold file information
+ 
   struct FileInfo* fileInfos = malloc((argc - 1) * sizeof(struct FileInfo));
 
   if (fileInfos == NULL)
@@ -38,7 +36,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  // Obtain file sizes and store file information
+  
   for (int i = 1; i <argc; i++) 
   {
     struct stat fileStat;
@@ -55,20 +53,16 @@ int main(int argc, char* argv[])
     }
   }
 
-  // Sort the fileInfos array based on file size
+ 
   qsort(fileInfos, argc - 1, sizeof(struct FileInfo), compareFileInfo);
 
-  // Display the sorted file names
+ 
   for (int i = 0; i < argc - 1; i++) 
   {
     printf("%s: %ld bytes\n", fileInfos[i].name, (long)fileInfos[i].size);
     free(fileInfos[i].name);
   }
-/*Assignment No-24 Write a C program that print the exit status of a terminated child process.
-
-In Unix-like operating systems, you can use the wait or waitpid system calls to retrieve the exit status of
-a terminated child process. Here&#39;s a C program that demonstrates how to print the exit status of a
-terminated child process:*/
+b.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,7 +75,7 @@ int main() {
 pid_t child_pid;
 int status;
 
-// Create a child process
+
 child_pid = fork();
 
 if (child_pid == -1) {
@@ -90,28 +84,27 @@ exit(EXIT_FAILURE);
 }
 
 if (child_pid == 0) {
-// Child process
 printf("Child process (PID %d) is running.\n", getpid());
-// Simulate some work in the child process
+
 sleep(2);
 printf("Child process (PID %d) is exiting.\n", getpid());
 exit(42); // Exit with status 42
 } else {
-// Parent process
+
 printf("Parent process (PID %d) is waiting for the child to terminate.\n", getpid());
 
-// Wait for the child to terminate and retrieve its exit status
+
 if (wait(&status) == -1) {
 perror("wait");
 exit(EXIT_FAILURE);
 }
 
 if (WIFEXITED(status)) {
-// Child exited normally
+
 int exit_status = WEXITSTATUS(status);
 printf("Child process (PID %d) exited with status: %d\n", child_pid, exit_status);
 } else if (WIFSIGNALED(status)) {
-// Child was terminated by a signal
+
 int term_signal = WTERMSIG(status);
 printf("Child process (PID %d) was terminated by signal: %d\n", child_pid, term_signal);
 }
@@ -120,9 +113,8 @@ printf("Child process (PID %d) was terminated by signal: %d\n", child_pid, term_
 return 0;
 }
 
-  // Free allocated memory
+  
   free(fileInfos);
 
   return 0;
 }
-b.
