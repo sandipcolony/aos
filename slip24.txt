@@ -1,4 +1,4 @@
-//Assignment No-4: Print the type of file where file name accepted through Command Line.
+a.
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -58,7 +58,6 @@ int main(int argc, char *argv[])
     return 0;
 }
 b.
-/*Assignment No 31 You can create a C program that spawns a child process to run a Linux/Unix command or any user-defined program. The parent process will set a signal handler for the death of the child (SIGCHLD) signal and the alarm (SIGALRM) signal. If the child process does not complete its execution within 5 seconds, the parent process will kill the child process. */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -83,11 +82,11 @@ void alarm_signal_handler(int signum) {
 int main() {
     pid_t child_pid;
 
-    // Set up signal handlers
+    
     signal(SIGCHLD, child_signal_handler);
     signal(SIGALRM, alarm_signal_handler);
 
-    // Create a child process
+  
     child_pid = fork();
 
     if (child_pid == -1) {
@@ -96,25 +95,24 @@ int main() {
     }
 
     if (child_pid == 0) {
-        // Child process
-        printf("Child process is running.\n");
+       cess is running.\n");
 
-        // Simulate a time-consuming operation (e.g., sleep for 10 seconds)
+        
         sleep(10);
 
         printf("Child process is done.\n");
         exit(EXIT_SUCCESS);
     } else {
-        // Parent process
+       
         printf("Parent process waiting for the child to complete or timeout (5 seconds).\n");
 
-        // Set an alarm for 5 seconds
+      
         alarm(5);
 
-        // Wait for the child to complete
+      
         wait(NULL);
 
-        // Disable the alarm
+       
         alarm(0);
 
         printf("Parent process is exiting.\n");
