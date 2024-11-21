@@ -1,4 +1,4 @@
-//Assignment No-5: Write a C program to find whether a given file is present in current directory or not.
+a.
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
