@@ -1,8 +1,4 @@
-Assignment No-10 Display all the files from current directory whose size is
-greater that n Bytes Where n is accept from user.You can create a C program to display all the files in the current directory whose size is greater than n bytes. You can accept n as input from the user. Here&#39;s a C program that accomplishes
-this:*/
-
-
+a.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,12 +7,12 @@ this:*/
 
 int main() 
 {
-    // Get the size &#39;n&#39; from the user
+   
     long long n;
     printf("Enter the minimum file size in bytes: ");
     scanf("%lld", &n);
 
-    // Open the current directory
+   
     DIR *dir = opendir(".");
     if (dir == NULL) 
     {
@@ -24,18 +20,18 @@ int main()
         return 1;
     }
 
-    // Read the directory entries
+   
     struct dirent *entry;
 
     while ((entry = readdir(dir)) != NULL) 
     {
-        // Skip "." and ".." directory entries
+        
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) 
         {
             continue;
         }
 
-        // Get file information
+       
         struct stat file_stat;
 
         if (stat(entry->d_name, &file_stat) == -1) 
@@ -44,15 +40,81 @@ int main()
             continue;
         }
 
-        // Check if the file size is greater than &#39;n&#39;
+        
         if (file_stat.st_size > n) 
         {
             printf("%s (%lld bytes)\n", entry->d_name, (long long)file_stat.st_size);
         }
     }
 
-    // Close the directory
+  
     closedir(dir);
 
     return 0;
+}
+b.
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+void child_signal_handler(int signum) 
+{
+    if (signum == SIGCHLD) 
+    {
+        printf("\n Child process has terminated");
+    }
+}
+
+void alarm_signal_handler(int signum) 
+{
+    if (signum == SIGALRM) 
+    {
+        printf("\n Child process did not complete within 5 seconds. Killing child");
+        kill(getpid(), SIGKILL);
+    }
+}
+
+int main() 
+{
+    pid_t child_pid;
+
+    signal(SIGCHLD, child_signal_handler);
+    signal(SIGALRM, alarm_signal_handler);
+
+    child_pid = fork();
+
+    if (child_pid == -1) 
+    {
+        printf("\n fork");
+        exit(1);
+    }
+
+    if (child_pid == 0) 
+    {
+        printf("\n Child process is running");
+
+        sleep(10);
+
+        printf("\n Child process is done");
+        exit(1);
+    } 
+    else 
+    {
+        printf("\n Parent process waiting for the child to complete or timeout (5 seconds)");
+
+        alarm(5);
+
+        wait(NULL);
+
+        alarm(0);
+
+        printf("\n Parent process is exiting");
+    }
+
+    return 0;
 }
