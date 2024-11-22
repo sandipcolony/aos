@@ -1,11 +1,11 @@
-//Assignment No-7 Read the current directory and display the name of the files, no of files in current directory.
+a.
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
 
 int main() 
 {
-    // Open the current directory
+    
     DIR *dir = opendir(".");
 
     if (dir == NULL) 
@@ -16,11 +16,11 @@ int main()
 
     int file_count = 0;
 
-    // Read the directory entries
+   
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL) 
     {
-        // Check if the entry is a regular file
+        
         if (entry->d_type == DT_REG) 
         {
             printf("%s\n", entry->d_name);
@@ -28,19 +28,14 @@ int main()
         }
     }
 
-    // Close the directory
+  
     closedir(dir);
 
     printf("Total number of files in the current directory: %d\n", file_count);
 
     return 0;
 }
-b./*Assignment No-21 Write a C program to create an unnamed pipe. The child process will write following
-three messages to pipe and parent process display it.
-Message1 = â€œHello Worldâ€
-Message2 = â€œHello SPPUâ€
-Message3 = â€œLinux is Funny
-To create an unnamed pipe in C and have a child process write three messages to the pipe while the parent process reads and displays them*/
+b.
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -52,13 +47,12 @@ int main() {
     int pipefd[2];
     pid_t child_pid;
 
-    // Create the pipe
+
     if (pipe(pipefd) == -1) {
         perror("pipe");
         exit(EXIT_FAILURE);
     }
 
-    // Create a child process
     child_pid = fork();
 
     if (child_pid == -1) {
@@ -67,10 +61,10 @@ int main() {
     }
 
     if (child_pid == 0) {
-        // Child process
-        close(pipefd[0]); // Close the read end of the pipe
+ 
+        close(pipefd[0]); 
 
-        // Messages to write
+   
         char messages[][MSG_SIZE] = {
             "Hello World",
             "Hello SPPU",
@@ -78,25 +72,24 @@ int main() {
         };
 
         for (int i = 0; i < 3; i++) {
-            // Write the message to the pipe
+      
             write(pipefd[1], messages[i], strlen(messages[i]) + 1);
         }
 
-        close(pipefd[1]); // Close the write end of the pipe in the child
+        close(pipefd[1]);
         exit(EXIT_SUCCESS);
     } else {
-        // Parent process
-        close(pipefd[1]); // Close the write end of the pipe
-
+       
+        close(pipefd[1]); 
         char buffer[MSG_SIZE];
 
         while (read(pipefd[0], buffer, sizeof(buffer)) > 0) {
-            // Read and display the messages from the pipe
+           
             printf("Parent received: %s\n", buffer);
         }
 
-        close(pipefd[0]); // Close the read end of the pipe in the parent
-        wait(NULL);       // Wait for the child to finish
+        close(pipefd[0]); 
+        wait(NULL);      
     }
 
     return 0;
