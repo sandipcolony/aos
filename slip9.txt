@@ -1,8 +1,4 @@
-//Assignment no-15 Generate parent process to write unnamed pipe and will read from it.
-//To create a parent process that writes to an unnamed pipe and a child process that reads from the same pipe, you can use the pipe, fork, and 
-//close system calls in a Unix C program. Here's a program that demonstrates this:
-
-
+a.
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -10,17 +6,16 @@
 
 int main() 
 {
-    int pipefd[2]; // File descriptors for the pipe
+    int pipefd[2];
     pid_t child_pid;
 
-    // Create an unnamed pipe
     if (pipe(pipefd) == -1) 
     {
         perror("Error creating pipe");
         return 1;
     }
 
-    // Create a child process
+
     child_pid = fork();
 
     if (child_pid == -1) 
@@ -31,32 +26,28 @@ int main()
 
     if (child_pid == 0) 
     {
-        // Child process: close write end of the pipe
         close(pipefd[1]);
 
         char buffer[256];
         int bytes_read;
 
-        // Read from the pipe
         while ((bytes_read = read(pipefd[0], buffer, sizeof(buffer))) > 0) 
         {
-            buffer[bytes_read] = '\0'; // Null-terminate the string
+            buffer[bytes_read] = '\0';
             printf("Child received: %s", buffer);
         }
 
-        // Close read end of the pipe in the child
         close(pipefd[0]);
     } 
     else 
     {
-        // Parent process: close read end of the pipe
         close(pipefd[0]);
 
-        // Write data to the pipe
+      
         const char *message = "Hello, child!\n";
         write(pipefd[1], message, strlen(message));
 
-        // Close write end of the pipe in the parent
+     
         close(pipefd[1]);
     }
 
