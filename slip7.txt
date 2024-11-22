@@ -1,4 +1,4 @@
-//Assignment No-11 Write a C Program that demonstrates redirection of standard output to a file.
+a.
 #include <stdio.h>
 #include <stdlib.h>
 #include<fcntl.h>
@@ -6,41 +6,37 @@
 
 int main() 
 {
-    // Declare a file pointer
+  
     FILE *file;
 
-    // Open a file for writing (or create if it doesn't exist)
+    
     file = fopen("output.txt", "w");
 
     if (file == NULL) 
     {
         perror("Error opening file");
-        return 1; // Exit with an error code
+        return 1;
     }
 
-    // Redirect standard output to the file
-    int file_descriptor = fileno(file);    //fileno - map a stream pointer to a file descriptor
+
+    int file_descriptor = fileno(file);  
     dup2(file_descriptor, 1);
 
-    // Now, anything written to stdout will be redirected to the file
-    // Print to stdout (which will be redirected to the file)
+   
     printf("This will be written to the file.\n");
 
-    // Close the file
+   
     fclose(file);
 
-    // Reset standard output to the original stdout
+   
     dup2(1, file_descriptor);
 
-    // Print to the original stdout (usually the terminal)
+  
     printf("This will be printed to the terminal.\n");
 
     return 0;
 }
-b./*Assignment no-19 Implement the following unix/linux command (use fork, pipe and exec system call) ls â€“l | wc â€“l
-To implement the Unix/Linux command ls -l | wc -l in a C program using fork, pipe, and exec system calls, you need to create a pipeline between the ls and wc commands. The ls command lists the files in the current directory with details, and wc -l counts the number of lines in the input.*/
-
-
+b.
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -52,14 +48,14 @@ int main()
     int pipe_fd[2];
     pid_t pid1, pid2;
 
-    // Create a pipe
+   
     if (pipe(pipe_fd) == -1) 
     {
         perror("pipe");
         exit(EXIT_FAILURE);
     }
 
-    // Fork the first child (for ls -l)
+ 
     pid1 = fork();
 
     if (pid1 == -1) 
@@ -69,22 +65,22 @@ int main()
     }
 
     if (pid1 == 0) 
-    { // Child 1 (ls -l)
-        // Close the read end of the pipe
+    {
+       
         close(pipe_fd[0]);
 
-        // Redirect stdout to the write end of the pipe
+    
         dup2(pipe_fd[1], STDOUT_FILENO);
         close(pipe_fd[1]);
 
-        // Execute ls -l
+        
         execlp("ls", "ls", "-l", NULL);
         perror("execlp (ls)");
         exit(EXIT_FAILURE);
     } 
     else 
     { // Parent
-        // Fork the second child (for wc -l)
+  
         pid2 = fork();
 
         if (pid2 == -1) 
@@ -94,26 +90,25 @@ int main()
         }
 
         if (pid2 == 0) 
-        { // Child 2 (wc -l)
-            // Close the write end of the pipe
+        {
+          
             close(pipe_fd[1]);
 
-            // Redirect stdin to the read end of the pipe
+      
             dup2(pipe_fd[0], STDIN_FILENO);
             close(pipe_fd[0]);
 
-            // Execute wc -l
             execlp("wc", "wc", "-l", NULL);
             perror("execlp (wc)");
             exit(EXIT_FAILURE);
         } 
         else 
-        { // Parent
-            // Close both ends of the pipe
+        {
+      
             close(pipe_fd[0]);
             close(pipe_fd[1]);
 
-            // Wait for both child processes to complete
+        
             wait(NULL);
             wait(NULL);
         }
